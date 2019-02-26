@@ -1,0 +1,14 @@
+C:\RadiosMotorola\bin\Debug\netcoreapp2.2\RadiosMotorola.deps.json
+C:\RadiosMotorola\bin\Debug\netcoreapp2.2\RadiosMotorola.runtimeconfig.json
+C:\RadiosMotorola\bin\Debug\netcoreapp2.2\RadiosMotorola.runtimeconfig.dev.json
+C:\RadiosMotorola\bin\Debug\netcoreapp2.2\RadiosMotorola.dll
+C:\RadiosMotorola\bin\Debug\netcoreapp2.2\RadiosMotorola.pdb
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.csprojAssemblyReference.cache
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.csproj.CoreCompileInputs.cache
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.RazorAssemblyInfo.cache
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.RazorAssemblyInfo.cs
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.AssemblyInfoInputs.cache
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.AssemblyInfo.cs
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.RazorTargetAssemblyInfo.cache
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.dll
+C:\RadiosMotorola\obj\Debug\netcoreapp2.2\RadiosMotorola.pdb
