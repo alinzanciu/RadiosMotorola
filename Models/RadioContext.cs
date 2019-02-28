@@ -17,7 +17,7 @@ namespace RadiosMotorola.Models
         //this tells entity frameworks that the Radio class is something I want to replicate as a dataset threw our data context
         public DbSet<Radio> RadioItems { get; set; }
 
-        //Now we supply a connection string in the appsettings.json in order to create a connection to the specific DB
+        //Now I supply a connection string in the appsettings.json in order to create a connection to the specific DB
 
     }
 }

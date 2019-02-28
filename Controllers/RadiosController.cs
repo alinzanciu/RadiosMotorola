@@ -6,6 +6,9 @@ using System.Collections;
 using Microsoft.AspNetCore.Mvc;
 using RadiosMotorola.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Microsoft.CodeAnalysis;
+
 
 namespace RadiosMotorola.Controllers
 {
@@ -14,6 +17,7 @@ namespace RadiosMotorola.Controllers
     public class RadiosController : ControllerBase
     {
 
+        #region Initialization of DB and contructor
         /// <summary>
         /// The variable is used to access the content of the DB
         /// </summary>
@@ -22,12 +26,15 @@ namespace RadiosMotorola.Controllers
         //Constructor where I instantiate the _context (using contructor injection)
         public RadiosController(RadioContext context) => _context = context; //context comes directly from the Startup class, where I have registered the DB connection
 
+        #endregion
+
+        #region Parsing Strings methods - string comparison methods
         /// <summary>
         /// This list creates a list of available locations from a single string of multiple locations
         /// </summary>
         /// <param name="str">Passes the whole string of available locations</param>
         /// <returns></returns>
-        public IList<string> AvailableLocations(string str)
+        public IList<string> AvailableLocationsList(string str)
         {
             IList<string> listofLocations = str.Split(',').ToList<string>();
             listofLocations.Reverse();
@@ -76,82 +83,173 @@ namespace RadiosMotorola.Controllers
 
             return res;
         }
+#endregion
+
+        #region Payload Construction
+            /// <summary>
+            /// Payload for the : /radios/{id}/location
+            /// </summary>
+            public void Json_GetId(string loc)
+            {
+            //creating the object that we will add in the Json string later
+            PayloadGet_ID getId = new PayloadGet_ID()
+                {
+                    location = loc
+                };
+
+            //creates the address
+            string filePath = @"c:\RadiosMotorola\Temp\Getid.json";
+
+            //writing the Json File
+            WriteJsonFile(filePath, JsonConvert.SerializeObject(getId));
+        }
+
+            /// <summary>
+            /// Payload for the : /radios/{id}
+            /// </summary>
+            public void Json_PostId(string str, IList<string> strList)
+            {
+            //creating the object that we will add in the Json string later
+            PayloadPost_ID postId = new PayloadPost_ID()
+                {
+                    alias= str,
+                    allowed_location = strList
+                };
+
+            //creates the address
+            string filePath = @"c:\RadiosMotorola\Temp\PostId.json";
+
+            //writing the Json File
+            WriteJsonFile(filePath, JsonConvert.SerializeObject(postId));
+            }
 
 
-        //Creating the action results
+
+            /// <summary>
+            /// Payload for the : /radios/{id}/location
+            /// </summary>
+            /// <param name="loc"></param>
+            public void Json_Post_Id_Location(string loc)
+            {
+                //creating the object that we will add in the Json string later
+                PayloadPost_ID_Location postIdLoc = new PayloadPost_ID_Location()
+                {
+                    location = loc
+                };
+
+                //creates the address
+                string filePath = @"c:\RadiosMotorola\Temp\PostId_Location.json";
+
+               //writing the Json File
+               WriteJsonFile(filePath, JsonConvert.SerializeObject(postIdLoc));
+            }
 
         /// <summary>
-        ///             1. GET : api/radios/{id}/location
-        //              Expects an ID attribute to be passed threw the URI
+        /// Writes Json file
+        /// </summary>
+        /// <param name="filePath">Location the file is saven at</param>
+        /// <param name="stringResultJson">The Json string generated in each Post/Get action</param>
+        public void WriteJsonFile(string filePath, string stringResultJson)
+        {
+            //Saving the Json file
+            try
+            {
+                //This file replaces the file for every postId action
+                System.IO.File.WriteAllText(filePath, stringResultJson);
+
+            }
+
+            catch (Exception ex)
+            {
+                //Error in case the file could not be written
+                Console.WriteLine("Error occured when trying to write Json file : " + ex.Message);
+            }
+        }
+        #endregion
+
+        #region Action results creation
+
+        /// <summary>
+        ///             1. GET : /radios/{id}/location
+        ///              Expects an ID attribute to be passed threw the URI
         /// </summary>
         [HttpGet("{id}/location")]
-        public ActionResult<string> GetRadioItem(int id)
+        public ActionResult GetRadioItem(int id)
         {
             var radioItem = _context.RadioItems.Find(id);
             var location = radioItem.location;
 
+            //I am checking to see if either the item does not exist or if the location is undefined (either null, empty or by using the undefined keyword)
+            if (radioItem.location == "" || radioItem.location == "undefined" || radioItem.location == null) return NotFound();
+            else
+            {
 
-            if (radioItem == null) return NotFound();
-            else return "Return: 200 OK { \"location\": \" " + location + " \" }";
+                Json_GetId(location);  //Payload returned in Json format
+                return Ok();           //Action result
+            }
+
         }
 
 
 
         /// <summary>
         ///             2. POST : /radios/{id}
-        //              Expects an ID attribute to be passed threw the URI
+        ///              Expects an ID attribute to be passed threw the URI
         /// </summary>
         [HttpPost("{id}")]
-        public ActionResult<string> PostRadioItemId_and_AllowedLocations(Radio radio)
+        public void PostRadioItemId_and_AllowedLocations(Radio radio)
         {
-            //adding to DB and saving changes
+            //Adding to DB and saving changes
             _context.RadioItems.Add(radio);
             _context.SaveChanges(); //it is important to save changes on the DB (DB Changes flushes the changes to the DataStore)
 
-            //creating the Payload message
+            //Creating the Payload message
             var alias = radio.alias;
             var allowedLocations = radio.allowed_locations;
 
-            //Returning the required Payload
-            return "Payload { \"alias\": \" " + alias + " \"," + PayloadFormattingFor_AllowedLocation(allowedLocations);
+            //Returning the required Payload in Json format
+            Json_PostId(alias, AvailableLocationsList(allowedLocations));
         }
 
         /// <summary>
-        ///             2. POST : /radios/{id}/location
-        //              Expects an ID attribute to be passed threw the URI
+        ///             3. POST : /radios/{id}/location
+        ///              Expects an ID attribute to be passed threw the URI
         /// </summary>
         [HttpPost("{id}/location")]
-        public ActionResult<string> PostRadioItem_and_LocationPermission(int id, Radio radio)//[FromBody] string location)
+        public ActionResult PostRadioItem_and_LocationPermission(int id, Radio radio)
         {
-            //look for the specific item in the DB
+            //Looking for the specific item in the DB
             var radioItem = _context.RadioItems.Find(id);
 
-            if (radioItem == null) NotFound();
-            if (radioItem != null) NotFound();
-            {
+            //if (radioItem == null) return NotFound();
+            //else    
+            //{
                 //creating the variables required to see if we can add a field or not
                 var allowedLocations = radioItem.allowed_locations;
-                IList<string> allowedLocationsList = AvailableLocations(allowedLocations);
+                IList<string> allowedLocationsList = AvailableLocationsList(allowedLocations);
 
                 //Returning the required Payload
                 if (IsLocation_PartOf_AvailableLocations(radio.location, allowedLocationsList))
                 {
+                    Console.WriteLine("!!! This is the new location "+ radio.location);
                     radioItem.location = radio.location;
 
                     //Adding modification to DB and saving changes
                     _context.Entry(radioItem).State = EntityState.Modified;
                     _context.SaveChanges(); //it is important to save changes on the DB (DB Changes flushes the changes to the DataStore)
 
-                    //Payload return
-                    return "Payload { \"location\": \" " + radio.location + " \"}" + "\nReturn: 200 OK";
+                    //Payload return in Json
+                   Json_Post_Id_Location(radio.location);
+                    
+                    //Action return 200 OK
+                    return Ok();
                 }
-
-                else
-                    return "Payload { \"location\": \" " + radio.location + " \"}" + "\nReturn: 403 FORBIDDEN";
-            }
+                //Action return 404 OK
+                else return NotFound();
+           // }
         }
 
-
+        #endregion
 
     }
 }
