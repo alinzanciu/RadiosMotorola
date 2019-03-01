@@ -98,7 +98,7 @@ namespace RadiosMotorola.Controllers
                 };
 
             //creates the address
-            string filePath = @"c:\RadiosMotorola\Temp\Getid.json";
+            string filePath = @"Temp\Getid.json";
 
             //writing the Json File
             WriteJsonFile(filePath, JsonConvert.SerializeObject(getId));
@@ -117,7 +117,7 @@ namespace RadiosMotorola.Controllers
                 };
 
             //creates the address
-            string filePath = @"c:\RadiosMotorola\Temp\PostId.json";
+            string filePath = @"Temp\PostId.json";
 
             //writing the Json File
             WriteJsonFile(filePath, JsonConvert.SerializeObject(postId));
@@ -138,7 +138,7 @@ namespace RadiosMotorola.Controllers
                 };
 
                 //creates the address
-                string filePath = @"c:\RadiosMotorola\Temp\PostId_Location.json";
+                string filePath = @"Temp\PostId_Location.json";
 
                //writing the Json File
                WriteJsonFile(filePath, JsonConvert.SerializeObject(postIdLoc));
